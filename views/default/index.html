@@ -12,6 +12,7 @@
     var addEventUrl = "{{=URL('api', 'addevent', hmac_key=session.hmac_key)}}";
     var feedbackUrl = "{{=URL('api', 'confirm', hmac_key=session.hmac_key)}}";
     var checkLoginUrl = "{{=URL('api', 'checklogin', hmac_key=session.hmac_key)}}";
+    var litEventsUrl = "{{=URL('api', 'litevents', hmac_key=session.hmac_key)}}";
 </script>
 <link rel="stylesheet" href="{{URL('static', 'css/bootstrap-datetimepicker.min.css')}}"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.6/assets/css/emojione.min.css"/>
@@ -21,36 +22,100 @@
 {{end}}
 
 <div class="main_content">
-    <div id="vue-div" class="row display:none">
+    <div id="vue-div" style="display: none">
+        <div id="event_watch" class="col-xs-4" v-if="page=='event_watch'" >
+            <button class="add_event" v-on:click="add_event_form()" v-bind:class="{disabled: !islogged}" >
+                <i class="fa fa-plus-square-o" aria-hidden="true"> Add Event</i>
+            </button>
 
-        <div id="event_view" class="col-xs-4" v-if="page=='event_view'">
-            <form>
-
-                <div class="form-group">
-                    <input v-model="addr" type="text" class="form-control" placeholder="address">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Lit Events</div>
+                <div class="panel-body">
+                    <ol type="1">
+                        <li v-for="event in hotevents">${event.title}</li>
+                    </ol>
                 </div>
+            </div>
+        </div>
 
-                <div class="form-group">
-                    <input v-model="title" type="text" class="form-control" placeholder="event title">
-                </div>
-                <div class="form-group">
-                    <textarea v-model="desc" type="text" class="form-control" placeholder="event description"></textarea>
-                </div>
+        <div id="event_add" class="col-xs-4" v-if="page=='event_add'">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Create An Event</div>
+                <form class="panel-body">
+                    <div class="form-group">
+                        <label for="address">Enter Address</label>
+                        <input v-model="addr" type="text" class="form-control"
+                               v-bind:disabled="usingMapMarker"
+                               placeholder="address" id="address">
+                    </div>
 
-                <div class="form-group">
-                    <div class='input-group date' id='datetimepicker1'>
-                        <input type='text' class="form-control" />
-                        <span class="input-group-addon">
+                    <div class="form-group">
+                        <label for="checkbox">Or: Use a
+                            Map Marker</label>
+                        <input type="checkbox" v-model="usingMapMarker" id="checkbox">
+                    </div>
+                    <div v-if="markerError" class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" v-on:click="markerError = false" aria-label="Close">
+                            <i class="fa fa-close fa-lg"
+                               aria-hidden="true"></i></button>
+                        <strong>Warning!</strong> You have not chosen a marker for this!
+                    </div>
+                    <div v-if="addressError" class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" v-on:click="addressError = false" aria-label="Close">
+                            <i class="fa fa-close fa-lg"
+                               aria-hidden="true"></i></button>
+                        <strong>Warning!</strong> Your Address Search returned No results!
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="title">Enter an event title</label>
+                        <input id="title" v-model="title" type="text" class="form-control" placeholder="event title">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Enter an event description</label>
+                        <textarea v-model="desc" rows="6" id="description" type="text" class="form-control"
+                                  placeholder="event description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="datetimepicker1">Enter a time the event occurs, from now until 15 days in
+                            future</label>
+                        <div class='input-group date' id='datetimepicker1'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
+                            <script type="application/javascript">
+                                $(function () {
+                                    $('#datetimepicker1').datetimepicker({
+                                        //don't let them set times less than right now
+                                        minDate: moment(),
+                                        //don't plan ahead too much, either, that's bad
+                                        maxDate: moment().add(15, 'days')
+                                    });
+                                });
+                            </script>
+                        </div>
                     </div>
-                </div>
 
-                <button type="submit" v-on:click.prevent="add_event_marker(addr, title, desc)" class="btn
-                btn-default"
-                v-bind:class="{disabled: !islogged}">PostMarker</button>
+                    <button type="submit" v-on:click.prevent="add_event_marker(addr, title, desc)" class="btn
+                btn-primary"
+                            v-bind:disabled="!islogged">Submit Event</button>
+                    <div v-if="inputError" class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" v-on:click="inputError = false" aria-label="Close">
+                            <i class="fa fa-close fa-lg"
+                               aria-hidden="true"></i></button>
+                        <strong>Warning!</strong> There are errors with your input!
+                    </div>
 
-            </form>
+
+                </form>
+
+            </div>
 
         </div>
 

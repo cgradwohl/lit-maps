@@ -9,7 +9,12 @@ def get_user_full_name(user_id):
     user = db(db.auth_user.id == user_id).select().first()
     return user.first_name + ' ' + user.last_name
 
+
 def translate_event(event):
+    """
+    :param event: event row we need to create the marker dictionary for
+    :return: a dictionary corresponding to all information needed to render the event on the front end
+    """
     event_dict = dict()
 
     event_dict['lat'] = event.latitude
@@ -91,6 +96,16 @@ def translate_event(event):
 
     return event_dict
 
+#Stanley added this
+def litevents():
+    events = db(db.events.occurs_at > (datetime.datetime.utcnow() - timedelta(hours=2))
+                                       ).select(orderby=~db.events.occurs_at)
+    return_dict = {'events': []}
+    for event in events:
+        return_dict['events'].append(translate_event(event))
+    return_dict['events'].sort(key = lambda event: event['total_attendees'])
+    return response.json(return_dict)
+
 def getmarkers():
     events = db(db.events.occurs_at > (datetime.datetime.utcnow() - timedelta(hours=2))
                                        ).select(orderby=~db.events.occurs_at)
@@ -102,18 +117,23 @@ def getmarkers():
 
 @auth.requires_login()
 def addevent():
-    lat = float(request.vars.latitude)
-    lng = float(request.vars.longitude)
-    title = request.vars.title
-    occur_date = request.vars.date
-    description = request.vars.description
-    occur_date = datetime.datetime.strptime(occur_date, "%Y-%m-%dT%H:%M:%S")
-    # parses ISO string, just call toISOString() on any javascript date object
-    event_id = db.events.insert(latitude=lat, longitude=lng, title=title, occurs_at=occur_date,
-                                description=description, creator=auth.user.id)
-    event = db(db.events.id == event_id).select().first()
-    response.status = 201
-    return response.json(translate_event(event))
+    lat = float(request.vars.latitude) if request.vars.latitude else None
+    lng = float(request.vars.longitude) if request.vars.longitude else None
+    title = str(request.vars.title) if request.vars.title else None
+    occur_date = str(request.vars.date) if request.vars.date else None
+    description = str(request.vars.description) if request.vars.description else None
+    if lat and lng and title and occur_date and description:
+        occur_date = datetime.datetime.strptime(occur_date, "%Y-%m-%dT%H:%M:%S")
+        # parses ISO string without timezones, as this is a pain to handle, call format on the moment
+        # object in default_index.js
+        event_id = db.events.insert(latitude=lat, longitude=lng, title=title, occurs_at=occur_date,
+                                    description=description, creator=auth.user.id)
+        event = db(db.events.id == event_id).select().first()
+        response.status = 201
+        return response.json(translate_event(event))
+    else:
+        response.status = 400
+        return response.json(dict());
 
 @auth.requires_login()
 def deleteevent():
