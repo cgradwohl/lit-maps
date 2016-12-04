@@ -16,6 +16,10 @@
      float: left;
      padding: 20px 200px 0 40px;
  }
+
+ .add_event_btn {
+    margin: 5%;
+ }
  /* Optional: Makes the sample page fill the window. */
  /*html, body {
     height: 100%;

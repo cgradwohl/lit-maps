@@ -29,9 +29,7 @@ var app = function() {
             lng: -122.0609
         });
         var options = [];
-        console.log(self.vue.islogged);
         if (self.vue.islogged) {
-            console.log('hmmm');
             options.push(
                 {
                     title: 'Add marker',
@@ -45,7 +43,6 @@ var app = function() {
                             lng: e.latLng.lng(),
                             title: 'Current Temporary Marker'
                         });
-                        console.log(self.vue.currTempMarker);
                     }
                 }
             )
@@ -260,7 +257,6 @@ var app = function() {
         if(page == 'event_watch'){
           $.get(litEventsUrl,
                 function (data) {
-                    console.log(data);
                     self.vue.hotevents = data.events;
                 })
         };
@@ -306,6 +302,14 @@ var app = function() {
         return equals(events1, events2, fields);
     };
 
+    self.trifecta = function() {
+        self.check_login();
+        self.auto_refresh(); //set to refresh page so we see all events
+        self.goto('event_watch');
+
+        $("#vue-div").show();
+    }
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -313,7 +317,7 @@ var app = function() {
         unsafeDelimiters: ['!{', '}'],
         data: {
             islogged  : false,
-            page      : 'event_watch',
+            page      : 'landing_page',
             events    : [],
             markers   : [],
             addr      : '',
@@ -323,30 +327,33 @@ var app = function() {
             desc      : '',
             map       : null,
             //usingMapMarker allows users to place an event by marker in addition to address search
-            usingMapMarker: false,
+            usingMapMarker   : false,
             //holds the current temporary marker if the user is
-            currTempMarker: null,
+            currTempMarker   : null,
             currTempMarkerPos: null,
-            inputError: false,
-            markerError: false,
-            addressError: false,
-            hotevents : [],
-            swappedPage: false,
+            inputError       : false,
+            markerError      : false,
+            addressError     : false,
+            hotevents        : [],
+            swappedPage      : false,
         },
         methods: {
             initmap         : self.initmap,
             add_event_marker: self.add_event_marker,
-            add_event_form: self.add_event_form,
-            goto: self.goto,
-            fire: self.fire,
-            del: self.del
+            add_event_form  : self.add_event_form,
+            goto            : self.goto,
+            fire            : self.fire,
+            del             : self.del,
+            first_load      : self.first_load,
+            load_events     : self.load_events,
+            trifecta        : self.trifecta
+
         }
     });
 
-    self.check_login(); //had to inject a lot of callbacks into this, would have loved promises, but don't
-                        //know the best library
-    self.auto_refresh(); //set to refresh page so we see all events
-    self.goto('event_watch');
+    //self.check_login();
+    //self.auto_refresh(); //set to refresh page so we see all events
+    //self.goto('event_watch');
 
     $("#vue-div").show();
     return self;

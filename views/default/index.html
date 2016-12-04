@@ -15,7 +15,7 @@
     var litEventsUrl = "{{=URL('api', 'litevents', hmac_key=session.hmac_key)}}";
 </script>
 <link rel="stylesheet" href="{{URL('static', 'css/bootstrap-datetimepicker.min.css')}}"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.6/assets/css/emojione.min.css"/>
+<link href="{{=URL('static','css/myapp.css')}}" rel="stylesheet" type="text/css"/>
 <script defer src="{{=URL('static', 'js/moment.js')}}"></script>
 <script defer src="{{=URL('static', 'js/bootstrap-datetimepicker.min.js')}}"></script>
 
@@ -23,8 +23,10 @@
 
 <div class="main_content">
     <div id="vue-div" style="display: none">
+
+
         <div id="event_watch" class="col-xs-4" v-if="page=='event_watch'" >
-            <button class="add_event" v-on:click="add_event_form()" v-bind:class="{disabled: !islogged}" >
+            <button class="add_event_btn" v-on:click="add_event_form()" v-bind:class="{disabled: !islogged}" >
                 <i class="fa fa-plus-square-o" aria-hidden="true"> Add Event</i>
             </button>
 
@@ -37,7 +39,8 @@
                     </ol>
                 </div>
             </div>
-        </div>
+        </div><!--page=='event_watch'-->
+
 
         <div id="event_add" class="col-xs-4" v-if="page=='event_add'">
             <div class="panel panel-primary">
@@ -105,7 +108,7 @@
                     btn-primary"
                             v-bind:disabled="!islogged">Submit Event</button>
 
-                    <button type="submit" v-on:click.prevent="page = 'event_watch'" class="btn
+                    <button type="submit" v-on:click.prevent="page='event_watch'" class="btn
                     btn-primary"
                             v-bind:disabled="!islogged">Cancel</button>
 
@@ -120,8 +123,15 @@
             </div>
         </div><!--page=='event_add'-->
 
-        <div id="map" class="col-xs-7"></div>
-    </div>
+
+
+        <div id="map" v-show="page=='event_add' || page=='event_watch'" class="col-xs-7"></div>
+
+        <div v-if="page=='landing_page'">
+            <button type="button" class="close" v-on:click="trifecta()" aria-label="Close">Push Me to leave Landing Page</button>
+
+        </div>
+    </div><!--vue-div-->
 </div>
 
 
