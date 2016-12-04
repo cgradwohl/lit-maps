@@ -32,7 +32,8 @@
                 <div class="panel-heading">Lit Events</div>
                 <div class="panel-body">
                     <ol type="1">
-                        <li v-for="event in hotevents">${event.title}</li>
+                        <!-- sort this list by likes -->
+                        <li v-for="event in hotevents">"${event.title}" has ${event.total_attendees} likes</li>
                     </ol>
                 </div>
             </div>
@@ -66,8 +67,6 @@
                                aria-hidden="true"></i></button>
                         <strong>Warning!</strong> Your Address Search returned No results!
                     </div>
-
-
 
                     <div class="form-group">
                         <label for="title">Enter an event title</label>
@@ -103,24 +102,25 @@
                     </div>
 
                     <button type="submit" v-on:click.prevent="add_event_marker(addr, title, desc)" class="btn
-                btn-primary"
+                    btn-primary"
                             v-bind:disabled="!islogged">Submit Event</button>
+
+                    <button type="submit" v-on:click.prevent="page = 'event_watch'" class="btn
+                    btn-primary"
+                            v-bind:disabled="!islogged">Cancel</button>
+
+
                     <div v-if="inputError" class="alert alert-danger alert-dismissible" role="alert">
                         <button type="button" class="close" v-on:click="inputError = false" aria-label="Close">
                             <i class="fa fa-close fa-lg"
                                aria-hidden="true"></i></button>
                         <strong>Warning!</strong> There are errors with your input!
                     </div>
-
-
-                </form>
-
+                </form><!--panel-body-->
             </div>
+        </div><!--page=='event_add'-->
 
-        </div>
-
-        <div id="map" class="col-xs-7">
-        </div>
+        <div id="map" class="col-xs-7"></div>
     </div>
 </div>
 

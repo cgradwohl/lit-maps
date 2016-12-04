@@ -23,12 +23,12 @@ def translate_event(event):
         event_dict['modifiable'] = True
     else:
         event_dict['modifiable'] = False
-    event_dict['creator'] = get_user_full_name(event.creator)
-    event_dict['occurs_at'] = event.occurs_at
-    event_dict['title'] = event.title
+    event_dict['creator']     = get_user_full_name(event.creator)
+    event_dict['occurs_at']   = event.occurs_at
+    event_dict['title']       = event.title
     event_dict['description'] = event.description
-    event_dict['edited_on'] = event.edited_on
-    logged_in_infobox ='<div class="btn btn-group">{}</div>'
+    event_dict['edited_on']   = event.edited_on
+    logged_in_infobox         ='<div class="btn btn-group">{}</div>'
     #lol how is there not a better way to do this in vue
 
     event_dict['id'] = event.id
@@ -72,6 +72,7 @@ def translate_event(event):
             <button onclick="APP.vue.fire({{= str(event['id'])}})" class="btn btn-success">
                 Like
             </button>
+
             <button onclick="APP.vue.del({{= str(event['id'])}})" class="btn btn-warning">
                 Dislike
             </button>
@@ -106,6 +107,11 @@ def litevents():
     return_dict['events'].sort(key = lambda event: event['total_attendees'])
     return response.json(return_dict)
 
+
+def get_likes():
+    event = db(db.events)
+
+
 def getmarkers():
     events = db(db.events.occurs_at > (datetime.datetime.utcnow() - timedelta(hours=2))
                                        ).select(orderby=~db.events.occurs_at)
@@ -114,6 +120,7 @@ def getmarkers():
         return_dict['events'].append(translate_event(event))
     return_dict['loggedin'] = True if auth.user is not None else False
     return response.json(return_dict)
+
 
 @auth.requires_login()
 def addevent():
@@ -145,7 +152,8 @@ def deleteevent():
 def checklogin():
     return response.json(dict(islogged= auth.user is not None))
 
-
+# Confirms the User to "like" the Event and prevents 'overliking'
+# returns nothing
 @auth.requires_login()
 def confirm():
     print('huh')

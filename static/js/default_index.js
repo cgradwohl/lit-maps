@@ -135,6 +135,9 @@ var app = function() {
         /*is googoo*/
         make_feedback(id, true);
     };
+
+
+
     self.del =  function(id) {
         //this dislikes an event
         console.log("NOFIRE");
@@ -153,6 +156,7 @@ var app = function() {
     self.add_event_marker = function() {
         //user can add an event by either placing marker directly on map or by
         //inputting address into search
+        self.vue.page = 'event_watch';
         var moment = $('#datetimepicker1').data("DateTimePicker").date();
         if(self.vue.title == '' || self.vue.desc == '' || moment == null){
             //handle error about invalid
@@ -232,8 +236,6 @@ var app = function() {
     self.load_events = function() {
         $.get(getMarkerUrl, function(data) {
             if (!cmpevents(data.events, self.vue.events) || self.vue.swappedPage){
-                console.log(data.events);
-                console.log(self.vue.events);
                 self.vue.map.removeMarkers();
                 self.vue.events = data.events;
                 self.show_events();
@@ -247,7 +249,7 @@ var app = function() {
           self.goto('event_add');
     };
 
-    //Stanley added this
+    //Stanley added this <- way to go bud
     self.goto = function(page){
         self.vue.page = page;
         if(page == 'event_add'){
