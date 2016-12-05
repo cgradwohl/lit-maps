@@ -2,25 +2,13 @@
 var app = function() {
 
     var self = {};
+    Vue.config.silent = false;
 
-    Vue.config.silent = false; // show all warnings
-
-    // Extends an array
-    self.extend = function(a, b) {
-        for (var i = 0; i < b.length; i++) {
-            a.push(b[i]);
-        }
-    };
 
     self.show_events = function() {
         self.vue.map.addMarkers(self.vue.events.map(make_marker_dict));
     };
 
-    self.auto_refresh = function () {
-        setInterval(
-            self.load_events, 60*1000
-        )
-    };
 
     self.initmap = function() {
         self.vue.map = new GMaps({
@@ -54,45 +42,16 @@ var app = function() {
                 options: options
             });
         }
-        //add controls for geolocating user location
-        self.vue.map.addControl({
-            position: 'top_center',
-            content: 'Geolocate',
-            style: {
-                margin: '5px',
-                padding: '1px 6px',
-                border: 'solid 1px #717B87',
-                background: '#fff'
-            },
-            events: {
-                click: function(){
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(function(position) {
-                            var pos = {
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude
-                            };
-                            self.vue.map.setCenter(pos);
-                        }, function() {
-                            alert('Your browser is old AF!');
-                        });
-                    }
-                }
-            }
-        });
-        //now load the events
         self.first_load();
         self.vue.map.addListener('idle', self.load_events);
     };
+
 
     self.first_load = function () {
         self.load_events();
         $("#vue-div").show();
     };
 
-    make_infobox = function(event) {
-        template = '<p>test</p>'
-    };
 
     make_marker_dict = function(event) {
         return {
@@ -108,8 +67,33 @@ var app = function() {
         //console.log(event);
     };
 
-    make_feedback = function(id, bool){
-        console.log(bool);
+
+    // this likes the event
+    self.fire = function(id){
+        var bool = true;
+        $.post(
+            feedbackUrl,
+            {
+                event_id: id,
+                isreal: bool
+            },
+            function(data){
+                $.get(getMarkerUrl, function(data) {
+                    if (!cmpevents(data.events, self.vue.events) || self.vue.swappedPage){
+                        self.vue.map.removeMarkers();
+                        self.vue.events = data.events;
+                        self.show_events();
+                        self.vue.swappedPage = false;
+                    }
+                })
+
+            }
+        )
+    };
+
+
+    self.del =  function(id) {
+        var bool = true;
         $.post(
             feedbackUrl,
             {
@@ -120,27 +104,7 @@ var app = function() {
                 console.log(data);
                 console.log("huh");
                 self.load_events();
-            }
-        )
-    };
-
-
-    self.fire = function(id){
-        // this likes an event
-        console.log("FIRE");
-        console.log("WE STARTED THE FIRE AT" + id.toString());
-        /*is googoo*/
-        make_feedback(id, true);
-    };
-
-
-
-    self.del =  function(id) {
-        //this dislikes an event
-        console.log("NOFIRE");
-        console.log("WE STOPPED THE FIRE AT" + id.toString());
-        /* is poopoo*/
-        make_feedback(id, false);
+        })
     };
 
 
@@ -304,8 +268,8 @@ var app = function() {
 
     self.trifecta = function() {
         self.check_login();
-        self.auto_refresh(); //set to refresh page so we see all events
         self.goto('event_watch');
+        self.load_events();
 
         $("#vue-div").show();
     }
@@ -351,9 +315,6 @@ var app = function() {
         }
     });
 
-    //self.check_login();
-    //self.auto_refresh(); //set to refresh page so we see all events
-    //self.goto('event_watch');
 
     $("#vue-div").show();
     return self;

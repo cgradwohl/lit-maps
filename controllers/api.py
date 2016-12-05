@@ -69,11 +69,11 @@ def translate_event(event):
     </span>
     {{if auth.user:}}
         <div class="btn-group-sm btn-group">
-            <button onclick="APP.vue.fire({{= str(event['id'])}})" class="btn btn-success">
+            <button onclick="APP.vue.fire({{= str(event['id'])}}); APP.vue.trifecta();" class="btn btn-success">
                 Like
             </button>
 
-            <button onclick="APP.vue.del({{= str(event['id'])}})" class="btn btn-warning">
+            <button onclick="APP.vue.del({{= str(event['id'])}}); APP.vue.trifecta();" class="btn btn-warning">
                 Dislike
             </button>
         </div>
