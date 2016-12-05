@@ -35,7 +35,6 @@ var app = function() {
                 }
             )
         }
-        //only add context menu if we have options to add to it
         if (options.length > 0) {
             self.vue.map.setContextMenu({
                 control: 'map',
@@ -64,7 +63,6 @@ var app = function() {
             },
             icon: event.marker_url
         };
-        //console.log(event);
     };
 
 
@@ -82,27 +80,27 @@ var app = function() {
                     if (!cmpevents(data.events, self.vue.events) || self.vue.swappedPage){
                         self.vue.map.removeMarkers();
                         self.vue.events = data.events;
-                        self.show_events();
+                        //self.show_events();
                         self.vue.swappedPage = false;
                     }
                 })
 
             }
         )
+        self.vue.page = 'landing_page';
+        self.goto('event_watch');
+
     };
 
 
     self.del =  function(id) {
-        var bool = true;
-        $.post(
-            feedbackUrl,
+        var bool = false;
+        $.post(feedbackUrl,
             {
                 event_id: id,
                 isreal: bool
             },
             function(data){
-                console.log(data);
-                console.log("huh");
                 self.load_events();
         })
     };
@@ -194,6 +192,7 @@ var app = function() {
         }
     };
 
+
     self.load_events = function() {
         $.get(getMarkerUrl, function(data) {
             if (!cmpevents(data.events, self.vue.events) || self.vue.swappedPage){
@@ -205,26 +204,27 @@ var app = function() {
         })
     };
 
-    //stanley added this
+
     self.add_event_form = function () {
           self.goto('event_add');
     };
 
-    //Stanley added this <- way to go bud
+
     self.goto = function(page){
         self.vue.page = page;
         if(page == 'event_add'){
-         //display form for user, dont forget to add vbind for logged in later!!
             self.vue.swappedPage = true;
             self.load_events();
         };
         if(page == 'event_watch'){
-          $.get(litEventsUrl,
+            $.get(litEventsUrl,
                 function (data) {
                     self.vue.hotevents = data.events;
-                })
+            })
+            
         };
     };
+
 
     self.check_login = function() {
         $.get(checkLoginUrl,
@@ -269,10 +269,11 @@ var app = function() {
     self.trifecta = function() {
         self.check_login();
         self.goto('event_watch');
+        self.show_events();
         self.load_events();
 
-        $("#vue-div").show();
     }
+
 
     // Complete as needed.
     self.vue = new Vue({
@@ -310,7 +311,8 @@ var app = function() {
             del             : self.del,
             first_load      : self.first_load,
             load_events     : self.load_events,
-            trifecta        : self.trifecta
+            trifecta        : self.trifecta,
+            reset           : self.reset
 
         }
     });

@@ -127,18 +127,32 @@
 
         <div id="map" v-show="page=='event_add' || page=='event_watch'" class="col-xs-7"></div>
 
-        <div v-if="page=='landing_page'">
-            <button type="button" class="close" v-on:click="trifecta()" aria-label="Close">Push Me to leave Landing Page</button>
+            <div v-if="page=='landing_page'">
+
+
+                <section id="banner" style="background: green;">
+                    <div class="wrapper">
+
+                        <div class="content">
+                          <h1 class="title" style="text-align: center; vertical-align: middle;">Welcome To LitMaps</h1>
+                          <h2 class="sub_title" style="text-align: center; vertical-align: middle;">A social map application that allows you to see local events near you.....no mater where you are.</h2>
+                        </div>
+
+                        <img src="views/default/images/landpageshot.jpg" alt="">
+
+                        <footer>
+                            <nav>
+                            <a href="#">Home</a>
+                            <a href="#" class="button button_secondary button_small">Get In Touch</a>
+                            <button type="button" class="close" v-on:click="trifecta()" aria-label="Close">Push Me to leave Landing Page</button>
+                            </nav>
+                        </footer>
+                    </div>
+                </section>
 
 
 
-            <!-- ################################################# -->
-            <!-- NEED TO SHOW LANDING PAGE WITH LOGIN VIEW HERE!!! -->
-            <!-- ################################################# -->
-
-
-
-        </div><!--landing_page-->
+            </div><!--landing_page-->
 
 
     </div><!--vue-div-->

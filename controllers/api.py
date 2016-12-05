@@ -69,11 +69,11 @@ def translate_event(event):
     </span>
     {{if auth.user:}}
         <div class="btn-group-sm btn-group">
-            <button onclick="APP.vue.fire({{= str(event['id'])}}); APP.vue.trifecta();" class="btn btn-success">
+            <button onclick="APP.vue.fire({{= str(event['id'])}})" class="btn btn-success">
                 Like
             </button>
 
-            <button onclick="APP.vue.del({{= str(event['id'])}}); APP.vue.trifecta();" class="btn btn-warning">
+            <button onclick="APP.vue.del({{= str(event['id'])}})" class="btn btn-warning">
                 Dislike
             </button>
         </div>
@@ -156,18 +156,15 @@ def checklogin():
 # returns nothing
 @auth.requires_login()
 def confirm():
-    print('huh')
     event_id = request.vars.event_id
     user_id = auth.user.id
     is_real = False if request.vars.isreal == 'false' else True
     event = db((db.confirmations.user_id==user_id) & (db.confirmations.event_id == event_id)).select().first()
     if event:
-        print('okay weird')
         print(event)
         event.update_record(confirmation=is_real)
 
     else:
-        print('huh')
         db.confirmations.insert(user_id=user_id, event_id=event_id, confirmation=is_real)
     response.status = 201
     return response.json('wegudfam')
